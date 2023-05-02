@@ -1,0 +1,113 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: 'web'
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: web
+  template:
+    metadata:
+      labels:
+        app: web
+    spec:
+      containers:
+        - image: "piesecurity/apache-struts2-cve-2017-5638:latest"
+          imagePullPolicy: Always
+          name: web
+          securityContext:
+          #   runAsUser: 1000
+             privileged: true      
+          ports:
+          - name: http
+            containerPort: 8080
+            protocol: TCP
+      serviceAccountName: web-service-account
+      restartPolicy: Always
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: 'web'
+  labels:
+    app: web
+spec:
+  type: "NodePort"
+  ports:
+  - name: http
+    port: 80
+    nodePort: 30004
+    protocol: TCP
+    targetPort: 8080
+  selector:
+    app: "web"
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: web-service-account
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: web-role
+rules:
+  - apiGroups:
+        - ""
+    resources:
+      - secrets
+    verbs: ["*"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: web-rolebinding
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: web-role 
+subjects:
+- kind: ServiceAccount
+  name: web-service-account
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: connectionstrings
+data:
+  sql: U2VydmVyPW15c3Fsc2VydmVyO0RhdGFiYXNlPWRiO1VzZXIgSWQ9YWRtaW47UGFzc3dvcmQ9UEBzc3dvcmQ7
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: admin-service-account
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: admin-clusterrolebinding
+subjects:
+- kind: ServiceAccount
+  name: admin-service-account
+  namespace: default
+roleRef:
+  kind: ClusterRole
+  name: cluster-admin
+  apiGroup: rbac.authorization.k8s.io
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: admin-service-account-token
+  annotations:
+    kubernetes.io/service-account.name: admin-service-account
+type: kubernetes.io/service-account-token
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: web-service-account-token
+  annotations:
+    kubernetes.io/service-account.name: web-service-account
+type: kubernetes.io/service-account-token

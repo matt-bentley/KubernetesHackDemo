@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: 'myapp'
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: myapp
+  template:
+    metadata:
+      labels:
+        app: myapp
+    spec:
+      containers:
+        - image: "myapp:latest"
+          imagePullPolicy: IfNotPresent
+          name: myapp
+          env:
+            - name: ASPNETCORE_URLS
+              value: "http://+:80;"
+          securityContext:
+          #   runAsUser: 1000
+             privileged: true       
+          ports:
+          - name: http
+            containerPort: 80
+            protocol: TCP
+      serviceAccountName: web-service-account
+      restartPolicy: Always
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: 'myapp'
+  labels:
+    app: myapp
+spec:
+  type: "NodePort"
+  ports:
+  - name: http
+    port: 80
+    nodePort: 30005
+    protocol: TCP
+    targetPort: 80
+  selector:
+    app: "myapp"
