@@ -53,7 +53,7 @@ Check attacker can access target:
 curl http://192.168.65.2:30004/index.action
 ```
 
-### Atack Target Container
+### Attack Target Container
 
 We are now going to use the Apache Struts 2 CVE to exploit the container using **Strutsshock**.
 
@@ -277,6 +277,21 @@ docker build -t myapp -f Dockerfile.poisoned .
 Force Pull Poisoned Image:
 ```bash
 kubectl rollout restart deploy myapp
+```
+
+### Sniff Traffic from Command and Control Server
+
+Install **tcpdump** on the target:
+
+```bash
+apt-get update
+apt-get install -y tcpdump
+```
+
+Sniff traffic from web server:
+
+```bash
+tcpdump -i eth0 -nn -s0 -v port 80
 ```
 
 ## Detecting Application Vulnerabilities
