@@ -59,6 +59,9 @@ We are now going to use the Apache Struts 2 CVE to exploit the container using *
 
 An invalid Content-Type header is passed into a request which throws an error. The error is not escaped properly which allows us to inject additional commands which will be performed on the target machine.
 
+![image](https://github.com/matt-bentley/KubernetesHackDemo/assets/27092434/c1833428-97a5-4143-ac24-81ce63cb7d11)
+
+
 Create Python script for strutshock attack:
 
 ```bash
