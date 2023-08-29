@@ -302,3 +302,15 @@ tcpdump -i eth0 -nn -s0 -v port 80
 ```bash
 snyk container test --app-vulns piesecurity/apache-struts2-cve-2017-5638:latest
 ```
+
+## Protecting Against Attacks
+
+![image](https://github.com/matt-bentley/KubernetesHackDemo/assets/27092434/b1c8d1ba-6a84-4b78-afe3-54efb732e61d)
+
+1. Image/code vulnerability scanning
+2. DON’T RUN CONTAINERS AS ROOT USER! Use a Policy Agent to stop insecure configurations being deployed e.g. Containers running as Root
+3. Use a Web Application Firewall
+4. Kubernetes Network Policies (Layer 3 and 4)
+5. Service Mesh with Layer 7 rules
+6. Runtime security monitoring
+7. Use Principle of Least Privilege
